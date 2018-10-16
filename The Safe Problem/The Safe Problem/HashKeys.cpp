@@ -22,7 +22,7 @@ int HashKeys::hashKey(int key) {
 	newKey += (hashVal((key / 1000) % 10, a)) * 1000;
 	newKey += (hashVal((key / 100) % 10, b)) * 100;
 	newKey += (hashVal((key / 10) % 10, c)) * 10;
-	newKey += hashVal((key) % 10, d);
+	newKey += (hashVal((key / 1) % 10, d)) * 1;
 
 	return newKey;
 }

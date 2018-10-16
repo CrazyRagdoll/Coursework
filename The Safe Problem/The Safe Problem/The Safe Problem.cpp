@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "HashKeys.h"
+#include "Lock.h"
 
 using namespace std;
 
@@ -13,44 +14,24 @@ int main()
 {
 
 	int root;
+	srand(2);// % 10000;
 	root = rand() % 10000;
 
 	HashKeys UHF, LHF, PHF;
 
-	int CN, LN, HN;
+	Lock lock0(root);
 
-	cout << "Root " << root << endl;
+	lock0.setNumber('C', UHF.hashKey(lock0.getNumber('H')));
+	lock0.setNumber('L', LHF.hashKey(lock0.getNumber('C')));
 
-	CN = UHF.hashKey(root);
+	cout << (lock0.checkCN() ? "CN is valid!" : "CN is invalid!");
 
-	cout << "CN " << CN << endl;
+	Lock lock1(lock0.getNumber('H'));
 
-	LN = LHF.hashKey(CN);
+	lock1.setNumber('C', UHF.hashKey(lock1.getNumber('H')));
+	lock1.setNumber('L', LHF.hashKey(lock1.getNumber('C')));
 
-	cout << "LN " << LN << endl;
-
-	HN = PHF.hashKey(LN);
-
-	cout << "HN " << HN << endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	cout << (lock1.checkCN() ? "CN is valid!" : "CN is invalid!");
 
 	int poop;
 	cin >> poop;
