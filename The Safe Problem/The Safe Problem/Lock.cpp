@@ -1,48 +1,29 @@
 #include "stdafx.h"
 #include "Lock.h"
 
-
-Lock::Lock(int hNumber) :
-	HN(hNumber),
-	CN(0),
-	LN(0)
-{
-}
-
-
 Lock::~Lock()
 {
-}
-
-void Lock::setNumber(char num, int val) {
-	switch (num) {
-	case 'C': CN = val;  break;
-	case 'L': LN = val;  break;
-	default: break;
-	}
-}
-
-int Lock::getNumber(char num) {
-	switch (num){
-	case 'C': return CN;  break;
-	case 'L': return LN;  break;
-	case 'H': return HN;  break;
-	default: return 0;
-	}	
 }
 
 //Return true if OK
 bool Lock::checkCN() {
 	int a, b, c, d;
-	a = (CN / 1000) % 10;
-	b = (CN / 100) % 10;
-	c = (CN / 10) % 10;
-	d = (CN / 1) % 10;
+	a = CN[0];
+	b = CN[1];
+	c = CN[2];
+	d = CN[3];
 
 	return (a != b && a != c && a != d && b != c && b != d && c != d);
-
 }
 
 bool Lock::checkLN() {
 	return (LN != CN);
+}
+
+ostream& operator<<(ostream& ostr, const Lock& lock) {
+	ostr << "CN" << lock.id << " " << lock.CN[0] << lock.CN[1] << lock.CN[2] << lock.CN[3]
+		<< ", LN" << lock.id << " " << lock.LN[0] << lock.LN[1] << lock.LN[2] << lock.LN[3]
+		<< ", HN" << lock.id << " " << lock.HN[0] << lock.HN[1] << lock.HN[2] << lock.HN[3];
+
+	return ostr;
 }

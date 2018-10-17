@@ -2,48 +2,57 @@
 #include "HashKeys.h"
 
 #include <cstdlib>
+#include <iostream>
 
-HashKeys::HashKeys() : 
-	a(rand() % 19 - 9),
-	b(rand() % 19 - 9),
-	c(rand() % 19 - 9),
-	d(rand() % 19 - 9)
-{
+HashKeys::HashKeys() {
+	for (int i = 0; i < 4; i++) {
+		hash_key[i] = rand() % 19 - 9;
+	}
 }
-
 
 HashKeys::~HashKeys()
 {
 }
 
-int HashKeys::hashKey(int key) {
-	int newKey = 0;
+int* HashKeys::hashKey(int* key) {
+	int *tmp = new int[4];
 
-	newKey += (hashVal((key / 1000) % 10, a)) * 1000;
-	newKey += (hashVal((key / 100) % 10, b)) * 100;
-	newKey += (hashVal((key / 10) % 10, c)) * 10;
-	newKey += (hashVal((key / 1) % 10, d)) * 1;
+	for (int i = 0; i < 4; i++) tmp[i] = hash(key[i], hash_key[i]);
 
-	return newKey;
+	return tmp;
+	delete[] tmp;
 }
 
-void HashKeys::setKey(int a, int b, int c, int d) {
-	a = a; b = b; c = c; d = d; 
-}
-
-int HashKeys::getKey(char x) {
-	switch(x) {
-		case 'a': return a;  break;
-		case 'b': return b;  break;
-		case 'c': return c;  break;
-		case 'd': return d;  break;
-		default: return 0;
+int HashKeys::hash(int x, int y) {
+	if (x + y > 9) {
+		return x + y - 10;
+	}
+	else if (x + y < 0) {
+		return x + y + 10;
+	}
+	else {
+		return x + y;
 	}
 }
 
-int HashKeys::hashVal(int val, int hashVal) {
-	int newVal = val + hashVal;
-	if (newVal < 0) newVal += 10;
-	else if (newVal > 9) newVal %= 10;
-	return newVal;
+
+void HashKeys::setKey(int a, int b, int c, int d) {
+	hash_key[0] = a;
+	hash_key[1] = b;
+	hash_key[2] = c;
+	hash_key[3] = d;
+}
+
+int* HashKeys::getKey() {
+	return hash_key;
+}
+
+ostream& operator<<(ostream& ostr, const HashKeys& key) {
+	
+	ostr << (key.hash_key[0] > 0 ? "+" : "") << key.hash_key[0] <<"," 
+		 << (key.hash_key[1] > 0 ? "+" : "") << key.hash_key[1] << ","
+		 << (key.hash_key[2] > 0 ? "+" : "") << key.hash_key[2] << ","
+		 << (key.hash_key[3] > 0 ? "+" : "") << key.hash_key[3];
+	
+	return ostr;
 }
