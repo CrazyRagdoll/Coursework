@@ -4,77 +4,62 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <vector>
-#include <chrono>
+#include <time.h>
 
 #include "HashKeys.h"
-#include "Lock.h"
+#include "MultiLock.h"
 
 using namespace std;
 
-void generateRoot(int* root);
+void generateRoot(int* root, int i);
 
-void generateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF);
+void printHashKeys(HashKeys UHF, HashKeys LHF, HashKeys PHF);
+void printRoot(int* root);
 
 int main()
 {
 	int root[4];
-
-	generateRoot(root);
-
 	HashKeys UHF, LHF, PHF;
+	MultiLock multiLock(root, UHF, LHF, PHF);
 
-	cout << "ROOT " << root[0] << root[1] << root[2] << root[3] << endl;
-	cout << "UHF " << UHF << endl;
-	cout << "LHF " << LHF << endl;
-	cout << "PHF " << PHF << endl;
+	printHashKeys(UHF, LHF, PHF);
 
-	int x;
-	cout << "How many iterations? ";
-	cin >> x;
+	int x; cout << "How many iterations? "; cin >> x;
 
-	auto start = chrono::steady_clock::now();
+	clock_t start;
+	start = clock();
 
-	for (int i = 1; i < x; i++) {
-		generateMultiLock(UHF, LHF, PHF);
+	for (int i = 0; i < x; i++) {
+		generateRoot(root, i);
+		multiLock = MultiLock(root, UHF, LHF, PHF);
+		cout << "Lock " << i << ": "; multiLock.printRoot();
+		if (multiLock.checkMultiLock()) {
+			cout << "Valid Lock!" << endl;
+		}
 	}
 
-	auto end = chrono::steady_clock::now();
-	cout << "done in " << chrono::duration_cast<chrono::milliseconds> (end - start).count();
-
-	int poop;
-	cin >> poop;
+	cout << x << " iterations took " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.";
 
     return 0;
 }
 
-void generateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
-	vector<Lock> multiLock;
+//Random Root Generation
+void generateRoot(int* root, int i) {
 
-	int root[4];
-	generateRoot(root);
-	multiLock.push_back(0);
-	multiLock[0].setCN(UHF.hashKey(root));
-	multiLock[0].setLN(LHF.hashKey(multiLock[0].getCN()));
-	multiLock[0].setHN(PHF.hashKey(multiLock[0].getLN()));
-
-	for (int i = 1; i < 5; i++) {
-		multiLock.push_back(Lock(i));
-		multiLock[i].setCN(UHF.hashKey(multiLock[i - 1].getHN()));
-		multiLock[i].setLN(LHF.hashKey(multiLock[i].getCN()));
-		multiLock[i].setHN(PHF.hashKey(multiLock[i].getLN()));
-	}
+	srand(i);
+	root[0] = rand() % 10;
+	root[1] = rand() % 10;
+	root[2] = rand() % 10;
+	root[3] = rand() % 10;
 
 }
 
-//Random Root Generation
-void generateRoot(int* root) {
+void printRoot(int* root) {
+	cout << "ROOT " << root[0] << root[1] << root[2] << root[3] << endl;
+}
 
-	srand(0);
-	int randy = rand() % 10000;
-	root[0] = randy / 1000 % 10;
-	root[1] = randy / 100 % 10;
-	root[2] = randy / 10 % 10;
-	root[3] = randy / 1 % 10;
-
+void printHashKeys(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
+	cout << "UHF " << UHF << endl;
+	cout << "LHF " << LHF << endl;
+	cout << "PHF " << PHF << endl;
 }

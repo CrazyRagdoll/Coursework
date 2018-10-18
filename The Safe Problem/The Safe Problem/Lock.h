@@ -19,8 +19,7 @@ public:
 	int* getLN() { return LN; }
 	int* getHN() { return HN; }
 
-	bool checkCN();
-	bool checkLN();
+	bool checkLock();
 
 	friend ostream& operator<<(ostream& ostr, const Lock& lock);
 

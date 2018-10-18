@@ -6,18 +6,19 @@ Lock::~Lock()
 }
 
 //Return true if OK
-bool Lock::checkCN() {
+bool Lock::checkLock() {
 	int a, b, c, d;
 	a = CN[0];
 	b = CN[1];
 	c = CN[2];
 	d = CN[3];
 
-	return (a != b && a != c && a != d && b != c && b != d && c != d);
-}
-
-bool Lock::checkLN() {
-	return (LN != CN);
+	if (a == b || a == c || a == d || b == c || b == d || c == d) {
+		return false;
+	}
+	else {
+		return (LN != CN);
+	}
 }
 
 ostream& operator<<(ostream& ostr, const Lock& lock) {
