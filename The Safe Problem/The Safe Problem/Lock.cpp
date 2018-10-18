@@ -7,13 +7,7 @@ Lock::~Lock()
 
 //Return true if OK
 bool Lock::checkLock() {
-	int a, b, c, d;
-	a = CN[0];
-	b = CN[1];
-	c = CN[2];
-	d = CN[3];
-
-	if (a == b || a == c || a == d || b == c || b == d || c == d) {
+	if (CN[0] == CN[1] || CN[0] == CN[2] || CN[0] == CN[3] || CN[1] == CN[2] || CN[1] == CN[3] || CN[2] == CN[3]) {
 		return false;
 	}
 	else {

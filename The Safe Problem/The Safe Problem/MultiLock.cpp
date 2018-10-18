@@ -40,6 +40,15 @@ bool MultiLock::checkMultiLock() {
 	return true;
 }
 
+void MultiLock::generateSafeFile(ofstream& myFile, string file, int solution) {
+	myFile.open(file, ios_base::app);
+	myFile << "NS" << solution << (checkMultiLock() ? " VALID" : " NOT VALID") << endl;
+	for (int i = 0; i < 5; i++) {
+		myFile << locks[i] << std::endl;
+	}
+	myFile.close();
+}
+
 void MultiLock::printRoot() {
 	cout << root[0] << root[1] << root[2] << root[3] << endl;
 }

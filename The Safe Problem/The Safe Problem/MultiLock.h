@@ -3,6 +3,7 @@
 #include "HashKeys.h"
 
 #include <vector>
+#include <fstream>
 
 class MultiLock :
 	public Lock
@@ -14,6 +15,8 @@ public:
 	void GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF);
 
 	bool checkMultiLock();
+
+	void generateSafeFile(ofstream& myFile, string file, int solution);
 
 	void printRoot();
 
