@@ -9,6 +9,7 @@ class MultiLock :
 	public Lock
 {
 public:
+	MultiLock() {};
 	MultiLock(int* root, HashKeys UHF, HashKeys LHF, HashKeys PHF);
 	~MultiLock();
 

@@ -33,10 +33,12 @@ void FileLoader::generateKeyFile(string file, vector<int> roots, HashKeys UHF, H
 
 void FileLoader::generateMultiSafeFile(string file, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) {
 	myOutputFile.open(file, ios_base::app);
+	int root[4];
+	MultiLock lockCheck;
 	for (int i = 0; i < (int)roots.size(); i += 4)
 	{
-		int root[4] = { roots[i], roots[i + 1], roots[i + 2], roots[i + 3] };
-		MultiLock lockCheck(root, UHF, LHF, PHF);
+		root[0] = roots[i]; root[1] = roots[i+1]; root[2] = roots[i]+2; root[3] = roots[i+3];
+		lockCheck = MultiLock(root, UHF, LHF, PHF);
 		(lockCheck.checkMultiLock() ? myOutputFile << "NS" << i / 4 << " VALID\n" : myOutputFile << "NS" << i / 4 << " NOT VALID\n");
 		myOutputFile << lockCheck;
 	}
@@ -57,10 +59,8 @@ void FileLoader::readKeyFile(string file, vector<int>& roots, HashKeys& UHF, Has
 		}
 	}
 
-	int lineCounter = 0;
 	while (getline(myInputFile, line)) {
 		if (line[0] == 'R') populateRoot(roots, line);
-		lineCounter++;
 	}
 	myInputFile.close();
 }

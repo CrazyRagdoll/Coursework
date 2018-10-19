@@ -35,7 +35,7 @@ int main()
 
 	int validSolutions = 0, seed = 0;
 	vector<int> validRoots;
-	while (validSolutions < 5) {
+	while (validSolutions < 10000) {
 		generateRoot(root, seed++);
 		multiLock = MultiLock(root, UHF, LHF, PHF);
 		if (multiLock.checkMultiLock()) {
