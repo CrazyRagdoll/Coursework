@@ -16,8 +16,6 @@ public:
 
 	bool checkMultiLock();
 
-	void generateSafeFile(ofstream& myFile, string file, int solution);
-
 	void printRoot();
 
 	friend ostream& operator<<(ostream& ostr, const MultiLock& multiLock);
