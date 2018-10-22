@@ -15,12 +15,11 @@ HashKeys::~HashKeys()
 }
 
 int* HashKeys::hashKey(int* key) {
-	int *tmp = new int[4];
+	int tmp[4];
 
 	for (int i = 0; i < 4; i++) tmp[i] = hash(key[i], hash_key[i]);
 
 	return tmp;
-	delete[] tmp;
 }
 
 int HashKeys::hash(int x, int y) {
@@ -49,7 +48,7 @@ int* HashKeys::getKey() {
 
 ostream& operator<<(ostream& ostr, const HashKeys& key) {
 	
-	ostr << (key.hash_key[0] > 0 ? "+" : "") << key.hash_key[0] <<"," 
+	ostr << (key.hash_key[0] > 0 ? "+" : "") << key.hash_key[0] << "," 
 		 << (key.hash_key[1] > 0 ? "+" : "") << key.hash_key[1] << ","
 		 << (key.hash_key[2] > 0 ? "+" : "") << key.hash_key[2] << ","
 		 << (key.hash_key[3] > 0 ? "+" : "") << key.hash_key[3];

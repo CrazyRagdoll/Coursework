@@ -5,8 +5,7 @@
 #include <vector>
 #include <fstream>
 
-class MultiLock :
-	public Lock
+class MultiLock
 {
 public:
 	MultiLock() {};
@@ -16,13 +15,14 @@ public:
 	void GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF);
 
 	bool checkMultiLock();
+	bool checkBONUSMultiLock();
 
 	void printRoot();
 
 	friend ostream& operator<<(ostream& ostr, const MultiLock& multiLock);
 
 protected:
+	Lock locks[5];
 	int root[4];
-	vector<Lock> locks;
 };
 

@@ -18,10 +18,6 @@ public:
 	friend ostream& operator<<(ostream& ostr, const HashKeys& key);
 
 protected:
-
-	int hash(int x, int y);
-
 	int hash_key[4];
-
+	int hash(int x, int y);
 };
-

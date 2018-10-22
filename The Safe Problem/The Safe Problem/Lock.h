@@ -20,15 +20,15 @@ public:
 	int* getHN() { return HN; }
 
 	bool checkLock();
+	bool checkNextLock(const Lock& rhs);
+	bool isEven();
 
 	friend ostream& operator<<(ostream& ostr, const Lock& lock);
 
 protected:
-	int id;
-
 	int CN[4];
 	int LN[4];
-	int HN[4];
-
+	int HN[4];	
+	int id;
 };
 

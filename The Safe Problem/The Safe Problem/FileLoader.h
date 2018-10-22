@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning( disable : 4290 ) 
+
 #include "stdafx.h"
 
 class FileLoader
@@ -7,8 +9,8 @@ public:
 	FileLoader() {};
 	~FileLoader() {};
 
-	void generateKeyFile(string file, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF);
-	void generateMultiSafeFile(string file, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF);
+	void generateKeyFile(string file, vector<int>& roots, HashKeys UHF, HashKeys LHF, HashKeys PHF);
+	void generateMultiSafeFile(string file, vector<int>& roots, HashKeys UHF, HashKeys LHF, HashKeys PHF);
 	void readKeyFile(string file, vector<int>& roots, HashKeys& UHF, HashKeys& LHF, HashKeys& PHF);
 
 protected:
@@ -20,24 +22,30 @@ protected:
 
 };
 
-void FileLoader::generateKeyFile(string file, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) {
+void FileLoader::generateKeyFile(string file, vector<int>& roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) throw (invalid_argument) {
 	myOutputFile.open(file, ios_base::app);
+
+	if (myOutputFile.fail()) throw invalid_argument("No file exists " + file);
+
 	myOutputFile << "NS " << roots.size() / 4 << endl;
 	for (int i = 0; i < (int)roots.size(); i += 4)
 	{
-		myOutputFile << "ROOT " << roots[i] << roots[i + 1] << roots[i + 2] << roots[i + 3] << endl;
+		myOutputFile << "ROOT " << roots[i + 0] << roots[i + 1] << roots[i + 2] << roots[i + 3] << endl;
 		myOutputFile << "UHF " << UHF << endl << "LHF " << LHF << endl << "PHF " << PHF << endl;
 	}
 	myOutputFile.close();
 }
 
-void FileLoader::generateMultiSafeFile(string file, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) {
+void FileLoader::generateMultiSafeFile(string file, vector<int>& roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) throw (invalid_argument)  {
 	myOutputFile.open(file, ios_base::app);
 	int root[4];
 	MultiLock lockCheck;
+
+	if (myOutputFile.fail()) throw invalid_argument("No file exists " + file);
+
 	for (int i = 0; i < (int)roots.size(); i += 4)
 	{
-		root[0] = roots[i]; root[1] = roots[i+1]; root[2] = roots[i]+2; root[3] = roots[i+3];
+		root[0] = roots[i + 0]; root[1] = roots[i + 1]; root[2] = roots[i + 2]; root[3] = roots[i + 3];
 		lockCheck = MultiLock(root, UHF, LHF, PHF);
 		(lockCheck.checkMultiLock() ? myOutputFile << "NS" << i / 4 << " VALID\n" : myOutputFile << "NS" << i / 4 << " NOT VALID\n");
 		myOutputFile << lockCheck;
@@ -45,10 +53,13 @@ void FileLoader::generateMultiSafeFile(string file, vector<int> roots, HashKeys 
 	myOutputFile.close();
 }
 
-void FileLoader::readKeyFile(string file, vector<int>& roots, HashKeys& UHF, HashKeys& LHF, HashKeys& PHF) {
+void FileLoader::readKeyFile(string file, vector<int>& roots, HashKeys& UHF, HashKeys& LHF, HashKeys& PHF) throw (invalid_argument) {
 	roots.clear();
 	string line;
 	myInputFile.open(file);
+
+	if (myInputFile.fail())	throw invalid_argument("No file exists " + file);
+
 	for (int i = 0; i < 5; i++) {
 		getline(myInputFile, line);
 		switch (line[0]) {

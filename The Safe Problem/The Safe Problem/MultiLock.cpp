@@ -13,20 +13,16 @@ MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF)
 	GenerateMultiLock(UHF, LHF, PHF);
 }
 
-
 MultiLock::~MultiLock()
 {
 }
 
-
 void MultiLock::GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
-	locks.push_back(0);
 	locks[0].setCN(UHF.hashKey(root));
 	locks[0].setLN(LHF.hashKey(locks[0].getCN()));
 	locks[0].setHN(PHF.hashKey(locks[0].getLN()));
 
 	for (int i = 1; i < 5; i++) {
-		locks.push_back(Lock(i));
 		locks[i].setCN(UHF.hashKey(locks[i - 1].getHN()));
 		locks[i].setLN(LHF.hashKey(locks[i].getCN()));
 		locks[i].setHN(PHF.hashKey(locks[i].getLN()));
@@ -40,13 +36,30 @@ bool MultiLock::checkMultiLock() {
 	return true;
 }
 
+//BONUS POINTS
+bool MultiLock::checkBONUSMultiLock() {
+	for (int i = 0; i < 5; i++) {
+		if (locks[i].checkLock() == false) return false;
+	}
+	//BONUS MULTI SAFE
+	for (int i = 0; i < 4; i++) {
+		if (locks[i].checkNextLock(locks[i+1]) == false) return false;
+	}
+	//BONUS MULTI SAFE
+	for (int i = 0; i < 5; i++) {
+		if (locks[i].isEven() == false) return false;
+	}
+
+	return true;
+}
+
 void MultiLock::printRoot() {
 	cout << root[0] << root[1] << root[2] << root[3] << endl;
 }
 
 ostream& operator<<(ostream& ostr, const MultiLock& multiLock){
 	for (int i = 0; i < 5; i++) {
-		ostr << multiLock.locks[i] << std::endl;
+		ostr << multiLock.locks[i] << "\n";
 	}
 	return ostr;
 }
