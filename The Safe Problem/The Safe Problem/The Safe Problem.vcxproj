@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="HashKeys.h" />
+    <ClInclude Include="Keys.h" />
     <ClInclude Include="Lock.h" />
     <ClInclude Include="MultiLock.h" />
     <ClInclude Include="stdafx.h" />

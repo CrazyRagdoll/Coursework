@@ -1,12 +1,20 @@
 #pragma once
-#include <stdint.h>
-#include <cstdlib>
 
+#include <ostream>
+
+using namespace std;
+
+template <Typename T>
 class Keys
 {
 public:
 
 	Keys()
+	{
+	}
+
+	Keys(int a, int b, int c, int d) :
+		a(a), b(b), c(c), d(d)
 	{
 	}
 
@@ -21,10 +29,10 @@ public:
 		c = rand() % 19 - 9;
 		d = rand() % 19 - 9;
 	}
+	
 
 protected:
 
-	int8_t a, b, c, d;
+	T a, b, c, d;
 
 };
-

@@ -17,12 +17,16 @@ public:
 	bool checkMultiLock();
 	bool checkBONUSMultiLock();
 
+	Lock getLock(int i) { return locks[i]; }
+
+	int getSize() { return size; };
+
 	void printRoot();
 
 	friend ostream& operator<<(ostream& ostr, const MultiLock& multiLock);
 
 protected:
 	Lock locks[5];
-	int root[4];
+	int root[4], size = 5;
 };
 
