@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "Lock.h"
 
+Lock::Lock(int id, int newLN[]) : id(id) {
+	for (int i = 0; i < 4; i++) {
+		LN[i] = newLN[i];
+	}
+}
+
 Lock::~Lock()
 {
 }

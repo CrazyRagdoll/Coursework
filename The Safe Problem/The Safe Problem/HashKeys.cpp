@@ -10,16 +10,19 @@ HashKeys::HashKeys() {
 	}
 }
 
+HashKeys::HashKeys(int i) {
+	srand(i);
+	for (int i = 0; i < 4; i++) {
+		hash_key[i] = rand() % 19 - 9;
+	}
+}
+
 HashKeys::~HashKeys()
 {
 }
 
-int* HashKeys::hashKey(int* key) {
-	int tmp[4];
-
+void HashKeys::hashKey(int* key, int* tmp) {
 	for (int i = 0; i < 4; i++) tmp[i] = hash(key[i], hash_key[i]);
-
-	return tmp;
 }
 
 int HashKeys::hash(int x, int y) {

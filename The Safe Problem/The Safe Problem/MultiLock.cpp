@@ -3,12 +3,20 @@
 
 #include <iostream>
 
+MultiLock::MultiLock() {
+
+}
+
 MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF)
 {
-	root[0] = newRoot[0];
-	root[1] = newRoot[1];
-	root[2] = newRoot[2];
-	root[3] = newRoot[3];
+	setRoot(newRoot);
+
+	GenerateMultiLock(UHF, LHF, PHF);
+}
+
+MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF, int size) : size(size)
+{
+	setRoot(newRoot);
 
 	GenerateMultiLock(UHF, LHF, PHF);
 }
@@ -18,19 +26,30 @@ MultiLock::~MultiLock()
 }
 
 void MultiLock::GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
-	locks[0].setCN(UHF.hashKey(root));
-	locks[0].setLN(LHF.hashKey(locks[0].getCN()));
-	locks[0].setHN(PHF.hashKey(locks[0].getLN()));
+	Lock tmp(0);
+	int val[4];
+	UHF.hashKey(root, val);
+	tmp.setCN(val);
+	LHF.hashKey(tmp.getCN(), val);
+	tmp.setLN(val);
+	PHF.hashKey(tmp.getLN(), val);
+	tmp.setHN(val);
+	locks.push_back(tmp);
 
-	for (int i = 1; i < 5; i++) {
-		locks[i].setCN(UHF.hashKey(locks[i - 1].getHN()));
-		locks[i].setLN(LHF.hashKey(locks[i].getCN()));
-		locks[i].setHN(PHF.hashKey(locks[i].getLN()));
+	for (int i = 1; i < size; i++) {
+		tmp = Lock(i);
+		UHF.hashKey(locks[i - 1].getHN(), val);
+		tmp.setCN(val);
+		LHF.hashKey(tmp.getCN(), val);
+		tmp.setLN(val);
+		PHF.hashKey(tmp.getLN(), val);
+		tmp.setHN(val);
+		locks.push_back(tmp);
 	}
 }
 
 bool MultiLock::checkMultiLock() {
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < size; i++) {
 		if (locks[i].checkLock() == false) return false;
 	}
 	return true;
@@ -38,27 +57,22 @@ bool MultiLock::checkMultiLock() {
 
 //BONUS POINTS
 bool MultiLock::checkBONUSMultiLock() {
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < size; i++) {
 		if (locks[i].checkLock() == false) return false;
 	}
 	//BONUS MULTI SAFE
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < size-1; i++) {
 		if (locks[i].checkNextLock(locks[i+1]) == false) return false;
 	}
 	//BONUS MULTI SAFE
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < size; i++) {
 		if (locks[i].isEven() == false) return false;
 	}
-
 	return true;
 }
 
-void MultiLock::printRoot() {
-	cout << root[0] << root[1] << root[2] << root[3] << endl;
-}
-
 ostream& operator<<(ostream& ostr, const MultiLock& multiLock){
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < multiLock.size; i++) {
 		ostr << multiLock.locks[i] << "\n";
 	}
 	return ostr;

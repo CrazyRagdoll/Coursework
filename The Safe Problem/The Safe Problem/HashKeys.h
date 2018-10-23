@@ -8,9 +8,10 @@ class HashKeys
 {
 public:
 	HashKeys();
+	HashKeys(int i);
 	~HashKeys();
 
-	int* hashKey(int* key);
+	void hashKey(int* key, int* tmp);
 
 	void setKey(int a, int b, int c, int d);
 	int* getKey();

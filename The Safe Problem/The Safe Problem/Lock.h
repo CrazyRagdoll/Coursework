@@ -9,6 +9,7 @@ class Lock
 public:
 	Lock() : id(0) {}
 	Lock(int id) : id(id) { }
+	Lock(int id, int LN[]);
 	~Lock();
 
 	void setCN(int val[]) { CN[0] = val[0]; CN[1] = val[1]; CN[2] = val[2]; CN[3] = val[3]; }

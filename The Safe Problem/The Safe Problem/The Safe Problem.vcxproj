@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileLoader.h" />
+    <ClInclude Include="HackerMan.h" />
     <ClInclude Include="HashKeys.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Lock.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HackerMan.cpp" />
     <ClCompile Include="HashKeys.cpp" />
     <ClCompile Include="Lock.cpp" />
     <ClCompile Include="MultiLock.cpp" />
