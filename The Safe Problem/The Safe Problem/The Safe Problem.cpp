@@ -15,6 +15,7 @@
 using namespace std;
 
 void generateRoot(int* root, int i);
+void generateReadSafeFile(vector<MultiLock>& safes, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF);
 
 const string KeyFile = "key file.txt";
 const string MultiSafeFile = "multi-safe file.txt";
@@ -27,7 +28,7 @@ int main()
 	MultiLock multiLock;
 	FileLoader myFiles;
 
-	int validSolutions = 0, bonusSolutions = 0, sols = 0, seed = 0, size = 5, iter = 0;
+	int validSols = 0, bonusSolutions = 0, sols = 0, seed = 0, size = 5, iter = 0;
 	vector<int> validRoots;
 	vector<MultiLock> validSafes;
 
@@ -39,12 +40,12 @@ int main()
 	clock_t start;
 	start = clock();
 
-	while (validSolutions < sols) {
+	while (validSols < sols) {
 		generateRoot(root, seed++);
 		multiLock = MultiLock(root, UHF, LHF, PHF, size);
 		if (multiLock.checkMultiLock()) {
 			validSafes.push_back(multiLock);
-			validSolutions++;
+			validSols++;
 			if (multiLock.checkBONUSMultiLock()) bonusSolutions++;
 		}
 		iter++;
@@ -59,7 +60,9 @@ int main()
 		myFiles.writeKeyFile		(KeyFile, validSafes, UHF, LHF, PHF);
 		myFiles.writeLockedSafeFile	(LockedSafeFile, validSafes, UHF, LHF, PHF);
 		myFiles.readKeyFile			(KeyFile, validRoots, UHF, LHF, PHF);
-		myFiles.writeMultiSafeFile	(MultiSafeFile, validSafes, UHF, LHF, PHF);
+		vector<MultiLock> readSafes;
+		generateReadSafeFile(readSafes, validRoots, UHF, LHF, PHF);
+		myFiles.writeMultiSafeFile	(MultiSafeFile, readSafes, UHF, LHF, PHF);
 	}
 	catch (const invalid_argument& iae) {
 		cout << "Unable to read data: " << iae.what() << endl;
@@ -71,20 +74,21 @@ int main()
 
 	//Coursework 2
 
-	int x;
-	cout << "Hack Safe? ";
-	cin >> x;
-	
-	if (x != 0) {
-		start = clock();
+	char hack = ' ';
+	cout << "Hack Safes? Y/N ";
+	cin >> hack;
 
-		vector<MultiLock> lockedSafes;
-		vector<int> lockedRoots, lockedLN;
-		vector<int> unlRoots, unlCN, unlLN, unlHN;
+	while (hack != 'y' && hack != 'n' && hack != 'Y' && hack != 'N') {
+		cout << "Please enter Y or N! "; 
+		cin >> hack;
+	} 
+	
+	if (hack == 'y' || hack == 'Y') {
+		start = clock();
+		vector<MultiLock> lockedSafes, unlockedSafes;
 
 		try {
-			//myFiles.readLockedSafeFile(LockedSafeFile, lockedRoots, lockedLN);
-			myFiles.readMultiSafeFile(MultiSafeFile, unlRoots, unlCN, unlLN, unlHN);
+			myFiles.readMultiSafeFile(MultiSafeFile, unlockedSafes);
 			myFiles.readLockedSafeFile(LockedSafeFile, lockedSafes);
 		}
 		catch (const invalid_argument& iae) {
@@ -92,12 +96,8 @@ int main()
 			exit(1);
 		}
 
-		HackerMan getHacked(lockedRoots, unlCN, lockedLN, unlHN);
-
-		HackerMan getHackedV2(lockedSafes);
-
-		cout << "Safe Hacked in " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.\n";
-
+		HackerMan getHacked(lockedSafes, unlockedSafes);
+		cout << "Safes Hacked in " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.\n";
 	}
 
     return 0;
@@ -107,4 +107,13 @@ int main()
 void generateRoot(int* root, int i) {
 	srand(i);
 	for (int i = 0; i < 4; i++) { root[i] = rand() % 10; }
+}
+
+void generateReadSafeFile(vector<MultiLock>& safes, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF) {
+	int root[4];
+	for (int i = 0; i < (int)roots.size(); i += 4) {
+		root[0] = roots[i + 0]; root[1] = roots[i + 1]; root[2] = roots[i + 2]; root[3] = roots[i + 3];
+		MultiLock tmpSafe(root, UHF, LHF, PHF);
+		safes.push_back(tmpSafe);
+	}
 }

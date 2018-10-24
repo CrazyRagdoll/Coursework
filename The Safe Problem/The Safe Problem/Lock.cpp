@@ -1,24 +1,12 @@
 #include "stdafx.h"
 #include "Lock.h"
 
-Lock::Lock(int id, int newLN[]) : id(id) {
-	for (int i = 0; i < 4; i++) {
-		LN[i] = newLN[i];
-	}
-}
-
-Lock::~Lock()
-{
-}
-
 //Return true if OK
 bool Lock::checkLock() {
 	if (CN[0] == CN[1] || CN[0] == CN[2] || CN[0] == CN[3] || CN[1] == CN[2] || CN[1] == CN[3] || CN[2] == CN[3]) {
 		return false;
 	}
-	else {
-		return (LN != CN);
-	}
+	else return true;
 }
 
 //BONUS MULTI_SAFE left lock must be less than right lock

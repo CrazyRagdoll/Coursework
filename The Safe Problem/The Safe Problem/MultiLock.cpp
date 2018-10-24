@@ -3,26 +3,20 @@
 
 #include <iostream>
 
-MultiLock::MultiLock() {
+MultiLock::MultiLock() : size(0){
 
 }
 
-MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF)
-{
+MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF) :size(5) {
 	setRoot(newRoot);
 
 	GenerateMultiLock(UHF, LHF, PHF);
 }
 
-MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF, int size) : size(size)
-{
+MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF, int size) : size(size) {
 	setRoot(newRoot);
 
 	GenerateMultiLock(UHF, LHF, PHF);
-}
-
-MultiLock::~MultiLock()
-{
 }
 
 void MultiLock::GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
@@ -72,7 +66,7 @@ bool MultiLock::checkBONUSMultiLock() {
 }
 
 ostream& operator<<(ostream& ostr, const MultiLock& multiLock){
-	for (int i = 0; i < multiLock.size; i++) {
+	for (int i = 0; i < multiLock.getSize(); i++) {
 		ostr << multiLock.locks[i] << "\n";
 	}
 	return ostr;

@@ -5,20 +5,27 @@
 #include <iostream>
 
 HashKeys::HashKeys() {
-	for (int i = 0; i < 4; i++) {
-		hash_key[i] = rand() % 19 - 9;
+	while (!OK_key) {
+		for (int i = 0; i < 4; i++) {
+			hash_key[i] = rand() % 19 - 9;
+		}
+		OK_key = check_key(hash_key);
 	}
 }
 
 HashKeys::HashKeys(int i) {
 	srand(i);
-	for (int i = 0; i < 4; i++) {
-		hash_key[i] = rand() % 19 - 9;
+	while (!OK_key) {
+		for (int i = 0; i < 4; i++) {
+			hash_key[i] = rand() % 19 - 9;
+		}
+		OK_key = check_key(hash_key);
 	}
 }
 
-HashKeys::~HashKeys()
-{
+bool HashKeys::check_key(int key[]) {
+	if (key[0] == 0 && key[1] == 0 && key[2] == 0 && key[3] == 0) return false; 
+	else return true;
 }
 
 void HashKeys::hashKey(int* key, int* tmp) {
@@ -26,15 +33,14 @@ void HashKeys::hashKey(int* key, int* tmp) {
 }
 
 int HashKeys::hash(int x, int y) {
-	if (x + y > 9) {
-		return x + y - 10;
+	int res = x + y;
+	while (res > 9) {
+		res -= 10;
 	}
-	else if (x + y < 0) {
-		return x + y + 10;
+	while (res < 0) {
+		res += 10;
 	}
-	else {
-		return x + y;
-	}
+	return res;
 }
 
 
