@@ -19,11 +19,19 @@ public:
 	void crackLHF();
 	void crackPHF();
 
+	int* getUHF() { return UHF; }
+	int* getLHF() { return LHF; }
+	int* getPHF() { return PHF; }
+	int getSize() const { return size; }
+
+	MultiLock getLockedSafe(int i) { return lockedSafes[i]; }
+
 	void populateHackerMan(MultiLock safe);
 	void populateSolutions(MultiLock safe);
 	
 private:
 	vector<MultiLock> lockedSafes, unlockedSafes;
+	int size;
 	int root[4];
 	int UHF[4] = { 0,0,0,0 };
 	int LHF[4] = { 0,0,0,0 };
@@ -33,5 +41,6 @@ private:
 
 	void fixVals(int& val);
 	void incIter(int* iter);
+	bool cracked(int* x, int* y);
 };
 

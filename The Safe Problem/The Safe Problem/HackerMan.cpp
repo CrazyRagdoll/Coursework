@@ -4,14 +4,14 @@
 #include <iostream>
 
 HackerMan::HackerMan(vector<MultiLock> lSafes) {
-	for (int i = 0; i < lSafes.size(); i++)
+	for (int i = 0; i < (int)lSafes.size(); i++)
 	{
 		lockedSafes.push_back(lSafes[i]);
 	}
 }
 
-HackerMan::HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes) {
-	for (int i = 0; i < lSafes.size(); i++)
+HackerMan::HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes) : size((int)lSafes.size()){
+	for (int i = 0; i < (int)lSafes.size(); i++)
 	{
 		lockedSafes.push_back(lSafes[i]);
 		unlockedSafes.push_back(uSafes[i]);
@@ -20,40 +20,31 @@ HackerMan::HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes) {
 }
 
 void HackerMan::hack() {
-	for (int i = 0; i < lockedSafes.size(); i++) {
-		cout << "Hacking Safe #" << i+1 << "...\n";
-		cout << "Populating Safe...\n";
-		populateHackerMan(lockedSafes[i]);
-		populateSolutions(unlockedSafes[i]);
-
-		cout << "Cracking UHF...\n";
-		crackUHF();
-		cout << "UHF Cracked!...\n";
-		cout << "Cracking LHF...\n";
-		crackLHF();
-		cout << "LHF Cracked!...\n";
-		cout << "Cracking PHF...\n";
-		crackPHF();
-		cout << "PHF Cracked!...\n";
-	
-	
-	
-	}
+	populateHackerMan(lockedSafes[0]);
+	populateSolutions(unlockedSafes[0]);
+	crackUHF();
+	crackLHF();
+	crackPHF();
 }
 
 void HackerMan::crackUHF() {
 	int UL_HF[4] = { LN[0] - root[0], LN[1] - root[1], LN[2] - root[2], LN[3] - root[3] };
+	for (int i = 0; i < 4; i++) fixVals(UL_HF[i]);
+
 	int iter[4] = { 0,0,0,0 };
 	bool equal = false;
+
 	while (!equal) {
 		incIter(iter);
 		UHF[0] = UL_HF[0] - iter[0];
 		UHF[1] = UL_HF[1] - iter[1];
 		UHF[2] = UL_HF[2] - iter[2];
 		UHF[3] = UL_HF[3] - iter[3];
-		if (((root[0] + UHF[0]) == CN_sol[0]) && ((root[1] + UHF[1]) == CN_sol[1]) && ((root[2] + UHF[2]) == CN_sol[2]) && ((root[3] + UHF[3]) == CN_sol[3])) {
-			equal = true;
-		}
+
+		int testCN[4] = { root[0] + UHF[0],  root[1] + UHF[1],  root[2] + UHF[2],  root[3] + UHF[3] };
+		for (int i = 0; i < 4; i++) fixVals(testCN[i]);
+
+		if ((testCN[0] == CN_sol[0]) && (testCN[1] == CN_sol[1]) && (testCN[2] == CN_sol[2]) && (testCN[3] == CN_sol[3])) equal = true;
 	}
 
 	//Quick way to figure out the CN by looping through each position of the root + newUHF
@@ -114,11 +105,11 @@ void HackerMan::populateSolutions(MultiLock safe) {
 }
 
 void HackerMan::fixVals(int& val) {
-	while (val < 0) {
-		val += 10;
-	}
 	while (val > 9) {
 		val -= 10;
+	}
+	while (val < 0) {
+		val += 10;
 	}
 }
 
@@ -132,10 +123,18 @@ void HackerMan::incIter(int* iter) {
 				if (iter[3] == 9) {
 					iter[3] = 0;
 				}
+				else iter[3]++;
 			}
 			else iter[2]++;
 		}
 		else iter[1]++;
 	}
 	else iter[0]++;
+}
+
+bool HackerMan::cracked(int* x, int* y) {
+	for (int i = 0; i < 4; i++) {
+		if (x[i] != y[i]) return false;
+	}
+	return true;
 }
