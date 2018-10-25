@@ -1,29 +1,29 @@
 // The Safe Problem.cpp : Defines the entry point for the console application.
 
 #include "stdafx.h"
+#include "HashKeys.h"
+#include "MultiLock.h"
+#include "FileLoader.h"
+#include "HackerMan.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <time.h>
 #include <string>
 
-#include "HashKeys.h"
-#include "MultiLock.h"
-#include "FileLoader.h"
-#include "HackerMan.h"
-
 using namespace std;
 
 void generateRoot(int* root, int i);
 void generateReadSafeFile(vector<MultiLock>& safes, vector<int> roots, HashKeys UHF, HashKeys LHF, HashKeys PHF, int size);
 
-const string KeyFile = "key file.txt";
-const string MultiSafeFile = "multi-safe file.txt";
-const string LockedSafeFile = "locked safe file.txt";
-const string HackedKeyFile = "hacked key file.txt";
-const string HackedSafeFile = "hacked safe file.txt";
+const string KeyFile = "key.txt";
+const string MultiSafeFile = "multi-safe.txt";
+const string LockedSafeFile = "locked-safe.txt";
+const string HackedKeyFile = "hacked key.txt";
+const string HackedSafeFile = "hacked safe.txt";
 
 int main()
+
 {
 	int root[4];
 	HashKeys UHF, LHF, PHF;
@@ -34,50 +34,62 @@ int main()
 	vector<int> validRoots;
 	vector<MultiLock> validSafes;
 
-	cout << "How many valid solutions do you require? ";
-	cin >> sols;
-	cout << "How large are the MultiLocks? ";
-	cin >> size;
+	char gen = ' ';
+	cout << "Generate new Safes? y/n ";
+	cin >> gen;
 
-	clock_t start;
-	start = clock();
+	while (gen != 'y' && gen != 'n' && gen != 'Y' && gen != 'N') {
+		cout << "Please enter Y or N! ";
+		cin >> gen;
+	}
+	
+	if (gen == 'Y' || gen == 'y') {
+		cout << "How many valid solutions do you require? ";
+		cin >> sols;
+		cout << "How large are the MultiLocks? ";
+		cin >> size;
 
-	while (validSols < sols) {
-		generateRoot(root, seed++);
-		multiLock = MultiLock(root, UHF, LHF, PHF, size);
-		if (multiLock.checkMultiLock()) {
-			validSafes.push_back(multiLock);
-			validSols++;
-			if (multiLock.checkBONUSMultiLock()) bonusSolutions++;
+		clock_t start;
+		start = clock();
+
+		while (validSols < sols) {
+			generateRoot(root, seed++);
+			multiLock = MultiLock(root, UHF, LHF, PHF, size);
+			if (multiLock.checkMultiLock()) {
+				validSafes.push_back(multiLock);
+				validSols++;
+				if (multiLock.checkBONUSMultiLock()) bonusSolutions++;
+			}
+			iter++;
+			if (iter > 15000) {
+				cout << "15000 Iterations & no solution; changing hash values.\n";
+				UHF = HashKeys(seed); LHF = HashKeys(seed); PHF = HashKeys(seed);
+				iter = 0;
+			}
 		}
-		iter++;
-		if (iter > 15000) {
-			cout << "15000 Iterations & no solution; changing hash values.\n";
-			UHF = HashKeys(seed); LHF = HashKeys(seed); PHF = HashKeys(seed);
-			iter = 0;
+
+		try {
+			myFiles.writeKeyFile(KeyFile, validSafes, UHF, LHF, PHF);
+			myFiles.writeLockedSafeFile(LockedSafeFile, validSafes, UHF, LHF, PHF);
+			myFiles.readKeyFile(KeyFile, validRoots, UHF, LHF, PHF);
+			vector<MultiLock> readSafes;
+			generateReadSafeFile(readSafes, validRoots, UHF, LHF, PHF, size);
+			myFiles.writeMultiSafeFile(MultiSafeFile, readSafes, UHF, LHF, PHF);
 		}
+		catch (const invalid_argument& iae) {
+			cout << "Unable to read data: " << iae.what() << endl;
+			//exit(1);
+		}
+
+		cout << bonusSolutions << " bonus solutions!\n";
+		cout << seed << " iterations took " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.\n";
 	}
 
-	try {
-		myFiles.writeKeyFile		(KeyFile, validSafes, UHF, LHF, PHF);
-		myFiles.writeLockedSafeFile	(LockedSafeFile, validSafes, UHF, LHF, PHF);
-		myFiles.readKeyFile			(KeyFile, validRoots, UHF, LHF, PHF);
-		vector<MultiLock> readSafes;
-		generateReadSafeFile(readSafes, validRoots, UHF, LHF, PHF, size);
-		myFiles.writeMultiSafeFile	(MultiSafeFile, readSafes, UHF, LHF, PHF);
-	}
-	catch (const invalid_argument& iae) {
-		cout << "Unable to read data: " << iae.what() << endl;
-		exit(1);
-	}
-
-	cout << bonusSolutions << " bonus solutions!\n";
-	cout << seed << " iterations took " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.\n";
 
 	//Coursework 2
 
 	char hack = ' ';
-	cout << "Hack Safes? Y/N ";
+	cout << "Hack Safes? y/n ";
 	cin >> hack;
 
 	while (hack != 'y' && hack != 'n' && hack != 'Y' && hack != 'N') {
@@ -86,7 +98,9 @@ int main()
 	} 
 	
 	if (hack == 'y' || hack == 'Y') {
+		clock_t start;
 		start = clock();
+
 		vector<MultiLock> lockedSafes, unlockedSafes;
 
 		try {
@@ -95,18 +109,18 @@ int main()
 		}
 		catch (const invalid_argument& iae) {
 			cout << "Unable to read data: " << iae.what() << endl;
-			exit(1);
+			//exit(1);
 		}
 
-		HackerMan getHacked(lockedSafes, unlockedSafes);
+		HackerMan hackSafe(lockedSafes, unlockedSafes);
 
-		UHF.setKey(getHacked.getUHF()[0], getHacked.getUHF()[1], getHacked.getUHF()[2], getHacked.getUHF()[3]);
-		LHF.setKey(getHacked.getLHF()[0], getHacked.getLHF()[1], getHacked.getLHF()[2], getHacked.getLHF()[3]);
-		PHF.setKey(getHacked.getPHF()[0], getHacked.getPHF()[1], getHacked.getPHF()[2], getHacked.getPHF()[3]);
+		UHF.setKey(hackSafe.getUHF()[0], hackSafe.getUHF()[1], hackSafe.getUHF()[2], hackSafe.getUHF()[3]);
+		LHF.setKey(hackSafe.getLHF()[0], hackSafe.getLHF()[1], hackSafe.getLHF()[2], hackSafe.getLHF()[3]);
+		PHF.setKey(hackSafe.getPHF()[0], hackSafe.getPHF()[1], hackSafe.getPHF()[2], hackSafe.getPHF()[3]);
 
 		vector<MultiLock> hackedSafes;
-		for(int i = 0; i < getHacked.getSize(); i++) {
-			hackedSafes.push_back(MultiLock(getHacked.getLockedSafe(i).getRoot(), UHF, LHF, PHF, getHacked.getLockedSafe(i).getSize()));
+		for(int i = 0; i < hackSafe.getSize(); i++) {
+			hackedSafes.push_back(MultiLock(hackSafe.getLockedSafe(i).getRoot(), UHF, LHF, PHF, hackSafe.getLockedSafe(i).getSize()));
 		}
 
 		try {
@@ -115,7 +129,7 @@ int main()
 		}
 		catch (const invalid_argument& iae) {
 			cout << "Unable to read data: " << iae.what() << endl;
-			exit(1);
+			//exit(1);
 		}
 
 		cout << "Safes Hacked in " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms.\n";

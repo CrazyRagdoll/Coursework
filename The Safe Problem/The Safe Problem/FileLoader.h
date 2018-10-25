@@ -1,9 +1,10 @@
 #pragma once
 #pragma warning( disable : 4290 ) 
 
-#include <cmath>
-
 #include "stdafx.h"
+
+#include <cmath>
+#include <string>
 
 class FileLoader
 {
@@ -23,6 +24,7 @@ protected:
 	void populateHash(HashKeys& key, string line);
 	void populateNum(vector<int>& num, string line, int offSet);
 	void populateNum(int* num, string line, int offSet);
+	void populateSafeFileNum(int* num, string line, int offSet);
 	void populateNumSols(int& num, string line, int offSet);
 
 	ofstream myOutputFile; 
@@ -35,7 +37,7 @@ void FileLoader::writeKeyFile(string file, vector<MultiLock> safes, HashKeys UHF
 
 	if (myOutputFile.fail()) throw invalid_argument("Failed to create " + file);
 
-	myOutputFile << "NS " << safes.size() << endl;
+	myOutputFile << "NS " << safes.size() << "\n";
 	for (int i = 0; i < (int)safes.size(); i++) {
 		myOutputFile << "ROOT " << safes[i].getRoot()[0] << safes[i].getRoot()[1] << safes[i].getRoot()[2] << safes[i].getRoot()[3] << "\n";
 		myOutputFile << "UHF " << UHF << "\n" << "LHF " << LHF << "\n" << "PHF " << PHF << "\n";
@@ -62,12 +64,12 @@ void FileLoader::writeLockedSafeFile(string file, vector<MultiLock> safes, HashK
 
 	if (myOutputFile.fail()) throw invalid_argument("Failed to create " + file);
 
-	myOutputFile << "NL " << safes.size() << endl;
+	myOutputFile << "NL " << safes.size() << "\n";
 	for (int i = 0; i < (int)safes.size(); i++)
 	{
-		myOutputFile << "ROOT " << safes[i].getRoot()[0] << safes[i].getRoot()[1] << safes[i].getRoot()[2] << safes[i].getRoot()[3] << "\n";
+		myOutputFile << "ROOT: " << safes[i].getRoot()[0] << " " << safes[i].getRoot()[1] << " " << safes[i].getRoot()[2] << " " << safes[i].getRoot()[3] << "\n";
 		for (int j = 0; j < safes[i].getSize(); j++) {
-			myOutputFile << "LN" << j << " " << safes[i].getLock(j)->getLN()[0] << safes[i].getLock(j)->getLN()[1] << safes[i].getLock(j)->getLN()[2] << safes[i].getLock(j)->getLN()[3] << "\n";
+			myOutputFile << "LN" << j << ": " << safes[i].getLock(j)->getLN()[0] << " " << safes[i].getLock(j)->getLN()[1] << " " << safes[i].getLock(j)->getLN()[2] << " " << safes[i].getLock(j)->getLN()[3] << "\n";
 		}
 		myOutputFile << "\n";
 	}
@@ -147,12 +149,12 @@ void FileLoader::readLockedSafeFile(string file, vector<MultiLock>& safes) throw
 
 		while (getline(myInputFile, line)) {
 			if (line[0] == 'R') {
-				populateNum(tmpRoot, line, 5);
+				populateSafeFileNum(tmpRoot, line, 6);
 				tmpSafe.setRoot(tmpRoot);
 			}
 			else if (line[0] == 'L')
 			{
-				populateNum(tmpLN, line, 4);
+				populateSafeFileNum(tmpLN, line, 5);
 				tmpSafe.addLock();
 				tmpSafe.getLock(count)->setLN(tmpLN);
 				count++;
@@ -179,6 +181,10 @@ void FileLoader::populateNum(vector<int>& num, string line, int offSet) {
 
 void FileLoader::populateNum(int* num, string line, int offSet) {
 	for (int i = 0; i < 4; i++) { num[i] = ((int)line[i + offSet] - 48); }
+}
+
+void FileLoader::populateSafeFileNum(int* num, string line, int offSet) {
+	for (int i = 0; i < 4; i++) { num[i] = ((int)line[(i*2) + offSet] - 48); }
 }
 
 void FileLoader::populateNumSols(int& num, string line, int offSet) {

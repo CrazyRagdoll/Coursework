@@ -22,17 +22,10 @@ MultiLock::MultiLock(int* newRoot, HashKeys UHF, HashKeys LHF, HashKeys PHF, int
 void MultiLock::GenerateMultiLock(HashKeys UHF, HashKeys LHF, HashKeys PHF) {
 	Lock tmp(0);
 	int val[4];
-	UHF.hashKey(root, val);
-	tmp.setCN(val);
-	LHF.hashKey(tmp.getCN(), val);
-	tmp.setLN(val);
-	PHF.hashKey(tmp.getLN(), val);
-	tmp.setHN(val);
-	locks.push_back(tmp);
 
-	for (int i = 1; i < size; i++) {
+	for (int i = 0; i < size; i++) {
 		tmp = Lock(i);
-		UHF.hashKey(locks[i - 1].getHN(), val);
+		if (i == 0) { UHF.hashKey(root, val); } else { UHF.hashKey(locks[i - 1].getHN(), val); }
 		tmp.setCN(val);
 		LHF.hashKey(tmp.getCN(), val);
 		tmp.setLN(val);

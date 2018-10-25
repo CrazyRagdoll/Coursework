@@ -1,8 +1,7 @@
 #pragma once
+#include "MultiLock.h"
 
 #include <vector>
-
-#include "MultiLock.h"
 
 using namespace std;
 
