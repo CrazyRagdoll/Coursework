@@ -2,6 +2,8 @@
 #include "HackerMan.h"
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 HackerMan::HackerMan(vector<MultiLock> lSafes) {
 	for (int i = 0; i < (int)lSafes.size(); i++)
@@ -16,7 +18,7 @@ HackerMan::HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes) : size(
 		lockedSafes.push_back(lSafes[i]);
 		unlockedSafes.push_back(uSafes[i]);
 	}
-	hack();
+	cinematicHack();
 }
 
 void HackerMan::hack() {
@@ -137,4 +139,48 @@ bool HackerMan::cracked(int* x, int* y) {
 		if (x[i] != y[i]) return false;
 	}
 	return true;
+}
+
+void HackerMan::cinematicHack() {
+
+	cout << "Loading HackerMan 3000........."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
+	cout << "[                                   ]\r[";
+	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] LOADED\n";
+
+
+	cout << "\nHackerMan 3000: Populating....."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
+	cout << "[                                   ]\r[";
+	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] POPULATED\n";
+	populateHackerMan(lockedSafes[0]);
+	populateSolutions(unlockedSafes[0]);
+
+	cout << "\nHackerMan 3000: Cracking UHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
+	crackUHF();
+	cout << "[                                   ]\r[";
+	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] CRACKED\n";
+
+	cout << "\nHackerMan 3000: Cracking LHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
+	crackLHF();
+	cout << "[                                   ]\r[";
+	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] CRACKED\n";
+
+	cout << "\nHackerMan 3000: Cracking PHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
+	crackPHF();
+	cout << "[                                   ]\r[";
+	for (int i = 0; i < 35; i++) { cout << "#"; } cout << "] CRACKED\n";
+
+	cout << "\n~~~~~~SAFE HACKED~~~~~~";
+	cout << "\n~~~~~~~HASH KEYS~~~~~~\n";
+
+	cout << "UHF: " << UHF[0] << ", " << UHF[1] << ", " << UHF[2] << ", " << UHF[3] << "\n";
+	cout << "LHF: " << LHF[0] << ", " << LHF[1] << ", " << LHF[2] << ", " << LHF[3] << "\n";
+	cout << "PHF: " << PHF[0] << ", " << PHF[1] << ", " << PHF[2] << ", " << PHF[3] << "\n\n";
+
+
+	sleep(2500);
+}
+
+
+void HackerMan::sleep(int i) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(i));
 }

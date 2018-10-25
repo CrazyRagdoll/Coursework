@@ -13,20 +13,12 @@ public:
 	HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes);
 	~HackerMan() {};
 
-	void hack();
-	void crackUHF();
-	void crackLHF();
-	void crackPHF();
-
 	int* getUHF() { return UHF; }
 	int* getLHF() { return LHF; }
 	int* getPHF() { return PHF; }
 	int getSize() const { return size; }
 
 	MultiLock getLockedSafe(int i) { return lockedSafes[i]; }
-
-	void populateHackerMan(MultiLock safe);
-	void populateSolutions(MultiLock safe);
 	
 private:
 	vector<MultiLock> lockedSafes, unlockedSafes;
@@ -41,5 +33,17 @@ private:
 	void fixVals(int& val);
 	void incIter(int* iter);
 	bool cracked(int* x, int* y);
+
+	void populateHackerMan(MultiLock safe);
+	void populateSolutions(MultiLock safe);
+
+	void hack();
+	void crackUHF();
+	void crackLHF();
+	void crackPHF();
+
+	void cinematicHack();
+	void sleep(int i);
+
 };
 
