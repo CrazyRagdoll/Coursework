@@ -13,9 +13,9 @@ public:
 	HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes);
 	~HackerMan() {};
 
-	int* getUHF() { return UHF; }
-	int* getLHF() { return LHF; }
-	int* getPHF() { return PHF; }
+	HashKeys getUHF(int i) { return UHF[i]; }
+	HashKeys getLHF(int i) { return LHF[i]; }
+	HashKeys getPHF(int i) { return PHF[i]; }
 	int getSize() const { return size; }
 
 	MultiLock getLockedSafe(int i) { return lockedSafes[i]; }
@@ -24,9 +24,8 @@ private:
 	vector<MultiLock> lockedSafes, unlockedSafes;
 	int size;
 	int root[4];
-	int UHF[4] = { 0,0,0,0 };
-	int LHF[4] = { 0,0,0,0 };
-	int PHF[4] = { 0,0,0,0 };
+
+	vector<HashKeys> UHF, LHF, PHF;
 	vector<int> CN, LN, HN;
 	vector<int> CN_sol, LN_sol, HN_sol;
 
@@ -38,9 +37,9 @@ private:
 	void populateSolutions(MultiLock safe);
 
 	void hack();
-	void crackUHF();
-	void crackLHF();
-	void crackPHF();
+	void crackUHF(int safe);
+	void crackLHF(int safe);
+	void crackPHF(int safe);
 
 	void cinematicHack();
 	void sleep(int i);

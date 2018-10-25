@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+#include <iostream>
 
 using namespace std;
 
@@ -14,9 +15,13 @@ public:
 	void hashKey(int* key, int* tmp);
 
 	void setKey(int a, int b, int c, int d);
-	int* getKey();
+	int* getKey() {	return hash_key; }
 
 	friend ostream& operator<<(ostream& ostr, const HashKeys& key);
+
+	int & operator[](int i);
+
+	HashKeys& operator=(const HashKeys& rhs);
 
 protected:
 	int hash_key[4];

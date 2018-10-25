@@ -5,6 +5,7 @@
 #include "MultiLock.h"
 #include "FileLoader.h"
 #include "HackerMan.h"
+#include "Thread.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -23,6 +24,7 @@ const string HackedKeyFile = "hacked key.txt";
 const string HackedSafeFile = "hacked safe.txt";
 
 int main()
+
 
 {
 	int root[4];
@@ -62,7 +64,7 @@ int main()
 			}
 			iter++;
 			if (iter > 15000) {
-				cout << "15000 Iterations & no solution; changing hash values.\n";
+				cout << "15000 Iterations; changing hash values.\n";
 				UHF = HashKeys(seed); LHF = HashKeys(seed); PHF = HashKeys(seed);
 				iter = 0;
 			}
@@ -74,7 +76,7 @@ int main()
 			myFiles.readKeyFile(KeyFile, validRoots, UHF, LHF, PHF);
 			vector<MultiLock> readSafes;
 			generateReadSafeFile(readSafes, validRoots, UHF, LHF, PHF, size);
-			myFiles.writeMultiSafeFile(MultiSafeFile, readSafes, UHF, LHF, PHF);
+			myFiles.writeMultiSafeFile(MultiSafeFile, readSafes);
 		}
 		catch (const invalid_argument& iae) {
 			cout << "Unable to read data: " << iae.what() << endl;
@@ -113,19 +115,20 @@ int main()
 		}
 
 		HackerMan hackSafe(lockedSafes, unlockedSafes);
-
-		UHF.setKey(hackSafe.getUHF()[0], hackSafe.getUHF()[1], hackSafe.getUHF()[2], hackSafe.getUHF()[3]);
-		LHF.setKey(hackSafe.getLHF()[0], hackSafe.getLHF()[1], hackSafe.getLHF()[2], hackSafe.getLHF()[3]);
-		PHF.setKey(hackSafe.getPHF()[0], hackSafe.getPHF()[1], hackSafe.getPHF()[2], hackSafe.getPHF()[3]);
-
 		vector<MultiLock> hackedSafes;
+		vector<HashKeys> hackedUHF, hackedLHF, hackedPHF;
+
 		for(int i = 0; i < hackSafe.getSize(); i++) {
-			hackedSafes.push_back(MultiLock(hackSafe.getLockedSafe(i).getRoot(), UHF, LHF, PHF, hackSafe.getLockedSafe(i).getSize()));
+			hackedUHF.push_back(hackSafe.getUHF(i));
+			hackedLHF.push_back(hackSafe.getLHF(i)); 
+			hackedPHF.push_back(hackSafe.getPHF(i));
+
+			hackedSafes.push_back(MultiLock(hackSafe.getLockedSafe(i).getRoot(), hackedUHF[i], hackedLHF[i], hackedPHF[i], hackSafe.getLockedSafe(i).getSize()));
 		}
 
 		try {
-			myFiles.writeKeyFile(HackedKeyFile, hackedSafes, UHF, LHF, PHF);
-			myFiles.writeMultiSafeFile(HackedSafeFile, hackedSafes, UHF, LHF, PHF);
+			myFiles.writeKeyFile(HackedKeyFile, hackedSafes, hackedUHF, hackedLHF, hackedPHF);
+			myFiles.writeMultiSafeFile(HackedSafeFile, hackedSafes);
 		}
 		catch (const invalid_argument& iae) {
 			cout << "Unable to read data: " << iae.what() << endl;

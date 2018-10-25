@@ -18,74 +18,85 @@ HackerMan::HackerMan(vector<MultiLock> lSafes, vector<MultiLock> uSafes) : size(
 		lockedSafes.push_back(lSafes[i]);
 		unlockedSafes.push_back(uSafes[i]);
 	}
-	cinematicHack();
+	hack();
+	//cinematicHack();
 }
 
 void HackerMan::hack() {
-	populateHackerMan(lockedSafes[0]);
-	populateSolutions(unlockedSafes[0]);
-	crackUHF();
-	crackLHF();
-	crackPHF();
+	for (int i = 0; i < lockedSafes.size(); i++) {
+		populateHackerMan(lockedSafes[i]);
+		populateSolutions(unlockedSafes[i]);
+		crackUHF(i);
+		crackLHF(i);
+		crackPHF(i);
+	}
 }
 
-void HackerMan::crackUHF() {
+void HackerMan::crackUHF(int safe) {
 	int UL_HF[4] = { LN[0] - root[0], LN[1] - root[1], LN[2] - root[2], LN[3] - root[3] };
 	for (int i = 0; i < 4; i++) fixVals(UL_HF[i]);
 
 	int iter[4] = { 0,0,0,0 };
+	int testCN[4];
 	bool equal = false;
 
+	HashKeys UHFtmp;
 	while (!equal) {
 		incIter(iter);
-		UHF[0] = UL_HF[0] - iter[0];
-		UHF[1] = UL_HF[1] - iter[1];
-		UHF[2] = UL_HF[2] - iter[2];
-		UHF[3] = UL_HF[3] - iter[3];
 
-		int testCN[4] = { root[0] + UHF[0],  root[1] + UHF[1],  root[2] + UHF[2],  root[3] + UHF[3] };
+		UHFtmp.setKey(UL_HF[0] - iter[0], UL_HF[1] - iter[1], UL_HF[2] - iter[2], UL_HF[3] - iter[3]);
+
+		testCN[0] = root[0] + UHFtmp[0];
+		testCN[1] = root[1] + UHFtmp[1];
+		testCN[2] = root[2] + UHFtmp[2];
+		testCN[3] = root[3] + UHFtmp[3];
+
 		for (int i = 0; i < 4; i++) fixVals(testCN[i]);
 
 		if ((testCN[0] == CN_sol[0]) && (testCN[1] == CN_sol[1]) && (testCN[2] == CN_sol[2]) && (testCN[3] == CN_sol[3])) equal = true;
 	}
 
-	//Quick way to figure out the CN by looping through each position of the root + newUHF
-	/*for (int i = 0; i < 4; i++) {
-	while ((root[i] + UHF[i]) != CN[i]) {
-		UHF[i]++;
-	}
-	}*/
+	UHF.push_back(UHFtmp);
+
 }
 
-void HackerMan::crackLHF() {
+
+void HackerMan::crackLHF(int safe) {
+	HashKeys LHFtmp;
 	for (int i = 0; i < 4; i++)
 	{
-		LHF[i] = LN[i] - root[i] - UHF[i];
-		fixVals(LHF[i]);
-	}	
+		LHFtmp[i] = LN[i] - root[i] - UHF[safe][i];
+		fixVals(LHFtmp[i]);
+	}
+	LHF.push_back(LHFtmp);
 }
 
-void HackerMan::crackPHF() {
+void HackerMan::crackPHF(int safe) {
 	//if we know two locked numbers we can find the PHF by:
 	//LN1 = LN0 + UHF + LHF + PHF	==	LN1 - LN0 + (UHF + LHF) = PHF
 	//LN0 = Root + UHF + LHF		==	Root - LN0 = (UHF + LHF)
 	//Therefore	we can sub them in  ==  PHF = LN1 - LN0 + Root - LN0	== PHF = LN1 - 2(LN0) + Root
+	HashKeys PHFtmp;
 	if (LN.size() >= 8) {
 		for (int i = 0; i < 4; i++) {
-			PHF[i] = root[i] + LN[i+4] - (2*(LN[i]));
+			PHFtmp[i] = root[i] + LN[i + 4] - (2 * (LN[i]));
 		}
 		for (int i = 0; i < 4; i++)
 		{
-			fixVals(PHF[i]);
+			fixVals(PHFtmp[i]);
 		}
 	}
 
-	HN[0] = LN[0] + PHF[0]; HN[1] = LN[1] + PHF[1];
-	HN[2] = LN[2] + PHF[2]; HN[3] = LN[3] + PHF[3];
+	HN[0] = LN[0] + PHFtmp[0]; HN[1] = LN[1] + PHFtmp[1];
+	HN[2] = LN[2] + PHFtmp[2]; HN[3] = LN[3] + PHFtmp[3];
 
+	PHF.push_back(PHFtmp);
 }
 
 void HackerMan::populateHackerMan(MultiLock safe) {
+	CN.clear();
+	LN.clear();
+	HN.clear();
 	for (int i = 0; i < 4; i++) { root[i] = safe.getRoot()[i]; }
 	for (int i = 0; i < safe.getSize(); i++) {
 		for (int j = 0; j < 4; j++) {
@@ -97,6 +108,9 @@ void HackerMan::populateHackerMan(MultiLock safe) {
 }
 
 void HackerMan::populateSolutions(MultiLock safe) {
+	CN_sol.clear();
+	LN_sol.clear();
+	HN_sol.clear();
 	for (int i = 0; i < safe.getSize(); i++) {
 		for (int j = 0; j < 4; j++) {
 			CN_sol.push_back(safe.getLock(i)->getCN()[j]);
@@ -147,34 +161,23 @@ void HackerMan::cinematicHack() {
 	cout << "[                                   ]\r[";
 	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] LOADED\n";
 
-
 	cout << "\nHackerMan 3000: Populating....."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
 	cout << "[                                   ]\r[";
 	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] POPULATED\n";
-	populateHackerMan(lockedSafes[0]);
-	populateSolutions(unlockedSafes[0]);
 
 	cout << "\nHackerMan 3000: Cracking UHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
-	crackUHF();
 	cout << "[                                   ]\r[";
 	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] CRACKED\n";
 
 	cout << "\nHackerMan 3000: Cracking LHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
-	crackLHF();
 	cout << "[                                   ]\r[";
 	for (int i = 0; i < 35; i++) { cout << "#"; sleep(50); } cout << "] CRACKED\n";
 
 	cout << "\nHackerMan 3000: Cracking PHF..."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << "."; sleep(250); cout << ".\n";
-	crackPHF();
 	cout << "[                                   ]\r[";
 	for (int i = 0; i < 35; i++) { cout << "#"; } cout << "] CRACKED\n";
 
-	cout << "\n~~~~~~SAFE HACKED~~~~~~";
-	cout << "\n~~~~~~~HASH KEYS~~~~~~\n";
-
-	cout << "UHF: " << UHF[0] << ", " << UHF[1] << ", " << UHF[2] << ", " << UHF[3] << "\n";
-	cout << "LHF: " << LHF[0] << ", " << LHF[1] << ", " << LHF[2] << ", " << LHF[3] << "\n";
-	cout << "PHF: " << PHF[0] << ", " << PHF[1] << ", " << PHF[2] << ", " << PHF[3] << "\n\n";
+	cout << "\n~~~~~~~~~~~SAFE HACKED~~~~~~~~~~~\n";
 
 
 	sleep(2500);

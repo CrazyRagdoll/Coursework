@@ -145,6 +145,7 @@
     <ClInclude Include="MultiLock.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HackerMan.cpp" />

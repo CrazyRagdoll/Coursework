@@ -13,7 +13,8 @@ public:
 	~FileLoader() {};
 
 	void writeKeyFile(string file, vector<MultiLock> safes, HashKeys UHF, HashKeys LHF, HashKeys PHF);
-	void writeMultiSafeFile(string file, vector<MultiLock> safes, HashKeys UHF, HashKeys LHF, HashKeys PHF);
+	void writeKeyFile(string file, vector<MultiLock> safes, vector<HashKeys> UHFs, vector<HashKeys> LHFs, vector<HashKeys> PHFs);
+	void writeMultiSafeFile(string file, vector<MultiLock> safes);
 	void writeLockedSafeFile(string file, vector<MultiLock> safes, HashKeys UHF, HashKeys LHF, HashKeys PHF);
 
 	void readKeyFile(string file, vector<int>& roots, HashKeys& UHF, HashKeys& LHF, HashKeys& PHF);
@@ -45,7 +46,20 @@ void FileLoader::writeKeyFile(string file, vector<MultiLock> safes, HashKeys UHF
 	myOutputFile.close();
 }
 
-void FileLoader::writeMultiSafeFile(string file, vector<MultiLock> safes, HashKeys UHF, HashKeys LHF, HashKeys PHF) throw (invalid_argument) {
+void FileLoader::writeKeyFile(string file, vector<MultiLock> safes, vector<HashKeys> UHFs, vector<HashKeys> LHFs, vector<HashKeys> PHFs) throw (invalid_argument) {
+	myOutputFile.open(file);
+
+	if (myOutputFile.fail()) throw invalid_argument("Failed to create " + file);
+
+	myOutputFile << "NS " << safes.size() << "\n";
+	for (int i = 0; i < (int)safes.size(); i++) {
+		myOutputFile << "ROOT " << safes[i].getRoot()[0] << safes[i].getRoot()[1] << safes[i].getRoot()[2] << safes[i].getRoot()[3] << "\n";
+		myOutputFile << "UHF " << UHFs[i] << "\n" << "LHF " << LHFs[i] << "\n" << "PHF " << PHFs[i] << "\n";
+	}
+	myOutputFile.close();
+}
+
+void FileLoader::writeMultiSafeFile(string file, vector<MultiLock> safes) throw (invalid_argument) {
 	myOutputFile.open(file);
 
 	if (myOutputFile.fail()) throw invalid_argument("Failed to create " + file);
@@ -58,6 +72,7 @@ void FileLoader::writeMultiSafeFile(string file, vector<MultiLock> safes, HashKe
 	}
 	myOutputFile.close();
 }
+
 
 void FileLoader::writeLockedSafeFile(string file, vector<MultiLock> safes, HashKeys UHF, HashKeys LHF, HashKeys PHF) throw (invalid_argument) {
 	myOutputFile.open(file);
